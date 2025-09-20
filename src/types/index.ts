@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   interests: string[];
-  hobbies: string[];
+  majors: string[];
   schedule: ClassSchedule[];
   buddies: string[];
 }

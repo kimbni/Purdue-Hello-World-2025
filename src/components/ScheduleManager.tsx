@@ -19,9 +19,11 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   IconButton,
-  Box
+  Box,
+  Paper,
+  Chip
 } from '@mui/material';
-import { Add, Edit, Delete, Schedule } from '@mui/icons-material';
+import { Add, Edit, Delete, Schedule, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { User, ClassSchedule } from '../types';
 
 interface ScheduleManagerProps {
@@ -36,6 +38,7 @@ const DAYS_OF_WEEK = [
 const ScheduleManager: React.FC<ScheduleManagerProps> = ({ user, onUpdateUser }) => {
   const [open, setOpen] = useState(false);
   const [editingClass, setEditingClass] = useState<ClassSchedule | null>(null);
+  const [currentWeek, setCurrentWeek] = useState(new Date());
   const [formData, setFormData] = useState({
     name: '',
     dayOfWeek: 1,
@@ -112,6 +115,45 @@ const ScheduleManager: React.FC<ScheduleManagerProps> = ({ user, onUpdateUser })
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
   };
 
+  const getWeekDates = (date: Date) => {
+    const week = [];
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - date.getDay()); // Start from Sunday
+    
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      week.push(day);
+    }
+    return week;
+  };
+
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    const newWeek = new Date(currentWeek);
+    newWeek.setDate(currentWeek.getDate() + (direction === 'next' ? 7 : -7));
+    setCurrentWeek(newWeek);
+  };
+
+  const getTimeSlotPosition = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return (hours - 7) * 60 + minutes; // Start from 7 AM
+  };
+
+  const getEventHeight = (startTime: string, endTime: string) => {
+    const [startHours, startMinutes] = startTime.split(':').map(Number);
+    const [endHours, endMinutes] = endTime.split(':').map(Number);
+    const startTotal = startHours * 60 + startMinutes;
+    const endTotal = endHours * 60 + endMinutes;
+    return endTotal - startTotal;
+  };
+
+  const timeSlots = Array.from({ length: 16 }, (_, i) => {
+    const hour = i + 7; // 7 AM to 10 PM
+    return `${hour.toString().padStart(2, '0')}:00`;
+  });
+
+  const weekDates = getWeekDates(currentWeek);
+
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -125,66 +167,142 @@ const ScheduleManager: React.FC<ScheduleManagerProps> = ({ user, onUpdateUser })
         </Button>
       </Box>
 
-      <Grid container spacing={3}>
-        {DAYS_OF_WEEK.map((day, index) => {
-          const classes = getClassesForDay(index);
-          return (
-            <Grid item xs={12} md={6} lg={4} key={day}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {day}
-                  </Typography>
-                  {classes.length > 0 ? (
-                    <List dense>
-                      {classes.map((classItem) => (
-                        <ListItem key={classItem.id}>
-                          <ListItemText
-                            primary={classItem.name}
-                            secondary={
-                              <Box>
-                                <Typography variant="body2" color="text.secondary">
-                                  {classItem.startTime} - {classItem.endTime}
-                                </Typography>
-                                {classItem.location && (
-                                  <Typography variant="body2" color="text.secondary">
-                                    {classItem.location}
-                                  </Typography>
-                                )}
-                              </Box>
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            <IconButton
-                              edge="end"
-                              onClick={() => handleOpen(classItem)}
-                              size="small"
-                            >
-                              <Edit />
-                            </IconButton>
-                            <IconButton
-                              edge="end"
-                              onClick={() => handleDelete(classItem.id)}
-                              size="small"
-                              color="error"
-                            >
-                              <Delete />
-                            </IconButton>
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                      ))}
-                    </List>
-                  ) : (
-                    <Typography color="text.secondary" variant="body2">
-                      No classes scheduled
-                    </Typography>
-                  )}
-                </CardContent>
-              </Card>
+      {/* Week Navigation */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Button
+          startIcon={<ChevronLeft />}
+          onClick={() => navigateWeek('prev')}
+        >
+          Previous Week
+        </Button>
+        <Typography variant="h6">
+          {weekDates[0].toLocaleDateString()} - {weekDates[6].toLocaleDateString()}
+        </Typography>
+        <Button
+          endIcon={<ChevronRight />}
+          onClick={() => navigateWeek('next')}
+        >
+          Next Week
+        </Button>
+      </Box>
+
+      {/* Weekly Calendar */}
+      <Paper elevation={2}>
+        <Box sx={{ overflow: 'auto' }}>
+          <Grid container>
+            {/* Time column */}
+            <Grid item xs={1}>
+              <Box sx={{ height: 60, borderBottom: 1, borderColor: 'divider' }} />
+              {timeSlots.map((time) => (
+                <Box
+                  key={time}
+                  sx={{
+                    height: 60,
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.75rem',
+                    color: 'text.secondary'
+                  }}
+                >
+                  {time}
+                </Box>
+              ))}
             </Grid>
-          );
-        })}
-      </Grid>
+
+            {/* Days of week */}
+            {DAYS_OF_WEEK.map((day, dayIndex) => {
+              const classes = getClassesForDay(dayIndex);
+              const isToday = weekDates[dayIndex].toDateString() === new Date().toDateString();
+              
+              return (
+                <Grid item xs={1.57} key={day}>
+                  {/* Day header */}
+                  <Box
+                    sx={{
+                      height: 60,
+                      borderBottom: 1,
+                      borderRight: 1,
+                      borderColor: 'divider',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: isToday ? 'primary.light' : 'background.paper',
+                      color: isToday ? 'primary.contrastText' : 'text.primary'
+                    }}
+                  >
+                    <Typography variant="body2" fontWeight="bold">
+                      {day}
+                    </Typography>
+                    <Typography variant="caption">
+                      {weekDates[dayIndex].getDate()}
+                    </Typography>
+                  </Box>
+
+                  {/* Time slots for this day */}
+                  <Box sx={{ position: 'relative', minHeight: 960 }}>
+                    {timeSlots.map((time) => (
+                      <Box
+                        key={time}
+                        sx={{
+                          height: 60,
+                          borderBottom: 1,
+                          borderRight: 1,
+                          borderColor: 'divider',
+                          position: 'relative'
+                        }}
+                      />
+                    ))}
+
+                    {/* Classes for this day */}
+                    {classes.map((classItem) => {
+                      const top = getTimeSlotPosition(classItem.startTime);
+                      const height = getEventHeight(classItem.startTime, classItem.endTime);
+                      
+                      return (
+                        <Box
+                          key={classItem.id}
+                          sx={{
+                            position: 'absolute',
+                            top: top,
+                            left: 4,
+                            right: 4,
+                            height: height,
+                            backgroundColor: 'primary.main',
+                            color: 'primary.contrastText',
+                            borderRadius: 1,
+                            p: 1,
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: 'primary.dark'
+                            }
+                          }}
+                          onClick={() => handleOpen(classItem)}
+                        >
+                          <Typography variant="caption" fontWeight="bold" noWrap>
+                            {classItem.name}
+                          </Typography>
+                          <Typography variant="caption" display="block" noWrap>
+                            {classItem.startTime} - {classItem.endTime}
+                          </Typography>
+                          {classItem.location && (
+                            <Typography variant="caption" display="block" noWrap>
+                              {classItem.location}
+                            </Typography>
+                          )}
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </Box>
+      </Paper>
 
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>

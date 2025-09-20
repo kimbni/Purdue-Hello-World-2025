@@ -11,10 +11,10 @@ import {
   Grid,
   Divider
 } from '@mui/material';
-import { Add, Delete, Favorite, SportsEsports } from '@mui/icons-material';
+import { Add, Delete, Favorite, School } from '@mui/icons-material';
 import { User } from '../types';
 
-interface InterestsManagerProps {
+interface InfoManagerProps {
   user: User;
   onUpdateUser: (user: User) => void;
 }
@@ -22,18 +22,22 @@ interface InterestsManagerProps {
 const COMMON_INTERESTS = [
   'Gaming', 'Movies', 'Music', 'Sports', 'Art', 'Photography', 'Cooking',
   'Reading', 'Travel', 'Fitness', 'Coffee', 'Technology', 'Fashion',
-  'Dancing', 'Hiking', 'Swimming', 'Basketball', 'Soccer', 'Tennis'
+  'Dancing', 'Hiking', 'Swimming', 'Basketball', 'Soccer', 'Tennis',
+  'Painting', 'Writing', 'Gardening', 'Knitting', 'Board Games', 'Video Games', 
+  'Playing Instruments', 'Singing', 'Yoga', 'Meditation', 'Collecting', 
+  'DIY Projects', 'Language Learning'
 ];
 
-const COMMON_HOBBIES = [
-  'Photography', 'Cooking', 'Painting', 'Writing', 'Gardening', 'Knitting',
-  'Board Games', 'Video Games', 'Playing Instruments', 'Singing', 'Dancing',
-  'Yoga', 'Meditation', 'Collecting', 'DIY Projects', 'Language Learning'
+const COMMON_MAJORS = [
+  'Computer Science', 'Mathematics', 'Engineering', 'Business', 'Psychology',
+  'Biology', 'Chemistry', 'Physics', 'English', 'History', 'Art', 'Music',
+  'Economics', 'Political Science', 'Sociology', 'Philosophy', 'Education',
+  'Nursing', 'Medicine', 'Law', 'Architecture', 'Communications', 'Marketing'
 ];
 
-const InterestsManager: React.FC<InterestsManagerProps> = ({ user, onUpdateUser }) => {
+const InfoManager: React.FC<InfoManagerProps> = ({ user, onUpdateUser }) => {
   const [newInterest, setNewInterest] = useState('');
-  const [newHobby, setNewHobby] = useState('');
+  const [newMajor, setNewMajor] = useState('');
 
   const addInterest = () => {
     if (newInterest.trim() && !user.interests.includes(newInterest.trim())) {
@@ -52,20 +56,20 @@ const InterestsManager: React.FC<InterestsManagerProps> = ({ user, onUpdateUser 
     });
   };
 
-  const addHobby = () => {
-    if (newHobby.trim() && !user.hobbies.includes(newHobby.trim())) {
+  const addMajor = () => {
+    if (newMajor.trim() && !user.majors.includes(newMajor.trim())) {
       onUpdateUser({
         ...user,
-        hobbies: [...user.hobbies, newHobby.trim()]
+        majors: [...user.majors, newMajor.trim()]
       });
-      setNewHobby('');
+      setNewMajor('');
     }
   };
 
-  const removeHobby = (hobby: string) => {
+  const removeMajor = (major: string) => {
     onUpdateUser({
       ...user,
-      hobbies: user.hobbies.filter(h => h !== hobby)
+      majors: user.majors.filter(m => m !== major)
     });
   };
 
@@ -78,11 +82,11 @@ const InterestsManager: React.FC<InterestsManagerProps> = ({ user, onUpdateUser 
     }
   };
 
-  const addCommonHobby = (hobby: string) => {
-    if (!user.hobbies.includes(hobby)) {
+  const addCommonMajor = (major: string) => {
+    if (!user.majors.includes(major)) {
       onUpdateUser({
         ...user,
-        hobbies: [...user.hobbies, hobby]
+        majors: [...user.majors, major]
       });
     }
   };
@@ -90,29 +94,30 @@ const InterestsManager: React.FC<InterestsManagerProps> = ({ user, onUpdateUser 
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Interests & Hobbies
+        Personal Info
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Tell us about your interests and hobbies so we can suggest better hangout activities!
+        Tell us about your interests, hobbies, and academic majors so we can suggest better hangout activities and connect you with like-minded buddies!
       </Typography>
 
       <Grid container spacing={3}>
-        {/* Interests Section */}
+        {/* Interests & Hobbies Section */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
                 <Favorite color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">Your Interests</Typography>
+                <Typography variant="h6">Your Interests & Hobbies</Typography>
               </Box>
               
               <Box display="flex" gap={1} mb={2}>
                 <TextField
                   size="small"
-                  placeholder="Add new interest..."
+                  placeholder="Add new interest or hobby..."
                   value={newInterest}
                   onChange={(e) => setNewInterest(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && addInterest()}
+                  fullWidth
                 />
                 <Button
                   variant="contained"
@@ -143,7 +148,7 @@ const InterestsManager: React.FC<InterestsManagerProps> = ({ user, onUpdateUser 
               <Box display="flex" flexWrap="wrap" gap={1}>
                 {COMMON_INTERESTS
                   .filter(interest => !user.interests.includes(interest))
-                  .slice(0, 8)
+                  .slice(0, 12)
                   .map((interest) => (
                     <Chip
                       key={interest}
@@ -158,38 +163,39 @@ const InterestsManager: React.FC<InterestsManagerProps> = ({ user, onUpdateUser 
           </Card>
         </Grid>
 
-        {/* Hobbies Section */}
+        {/* Majors Section */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
-                <SportsEsports color="secondary" sx={{ mr: 1 }} />
-                <Typography variant="h6">Your Hobbies</Typography>
+                <School color="secondary" sx={{ mr: 1 }} />
+                <Typography variant="h6">Your Majors</Typography>
               </Box>
               
               <Box display="flex" gap={1} mb={2}>
                 <TextField
                   size="small"
-                  placeholder="Add new hobby..."
-                  value={newHobby}
-                  onChange={(e) => setNewHobby(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addHobby()}
+                  placeholder="Add new major..."
+                  value={newMajor}
+                  onChange={(e) => setNewMajor(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && addMajor()}
+                  fullWidth
                 />
                 <Button
                   variant="contained"
-                  onClick={addHobby}
-                  disabled={!newHobby.trim()}
+                  onClick={addMajor}
+                  disabled={!newMajor.trim()}
                 >
                   Add
                 </Button>
               </Box>
 
               <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
-                {user.hobbies.map((hobby) => (
+                {user.majors.map((major) => (
                   <Chip
-                    key={hobby}
-                    label={hobby}
-                    onDelete={() => removeHobby(hobby)}
+                    key={major}
+                    label={major}
+                    onDelete={() => removeMajor(major)}
                     color="secondary"
                     variant="outlined"
                   />
@@ -202,14 +208,14 @@ const InterestsManager: React.FC<InterestsManagerProps> = ({ user, onUpdateUser 
                 Quick Add:
               </Typography>
               <Box display="flex" flexWrap="wrap" gap={1}>
-                {COMMON_HOBBIES
-                  .filter(hobby => !user.hobbies.includes(hobby))
-                  .slice(0, 8)
-                  .map((hobby) => (
+                {COMMON_MAJORS
+                  .filter(major => !user.majors.includes(major))
+                  .slice(0, 12)
+                  .map((major) => (
                     <Chip
-                      key={hobby}
-                      label={hobby}
-                      onClick={() => addCommonHobby(hobby)}
+                      key={major}
+                      label={major}
+                      onClick={() => addCommonMajor(major)}
                       variant="outlined"
                       size="small"
                     />
@@ -223,4 +229,4 @@ const InterestsManager: React.FC<InterestsManagerProps> = ({ user, onUpdateUser 
   );
 };
 
-export default InterestsManager;
+export default InfoManager;

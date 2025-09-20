@@ -18,7 +18,8 @@ import {
   Group, 
   Lightbulb,
   CheckCircle,
-  Cancel
+  Cancel,
+  School
 } from '@mui/icons-material';
 import { User, HangoutSuggestion } from '../types';
 
@@ -43,7 +44,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
       
       <Grid container spacing={3}>
         {/* Quick Stats */}
-        <Grid item xs={12} md={3}>
+        <Grid item xs={6} md={2.4}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -57,7 +58,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
           </Card>
         </Grid>
         
-        <Grid item xs={12} md={3}>
+        <Grid item xs={6} md={2.4}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -71,7 +72,21 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
           </Card>
         </Grid>
         
-        <Grid item xs={12} md={3}>
+        <Grid item xs={6} md={2.4}>
+          <Card>
+            <CardContent>
+              <Box display="flex" alignItems="center" mb={2}>
+                <School color="info" sx={{ mr: 1 }} />
+                <Typography variant="h6">Majors</Typography>
+              </Box>
+              <Typography variant="h3" color="info.main">
+                {user.majors.length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        
+        <Grid item xs={6} md={2.4}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -85,7 +100,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
           </Card>
         </Grid>
         
-        <Grid item xs={12} md={3}>
+        <Grid item xs={6} md={2.4}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -134,19 +149,27 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Your Interests
+                Your Interests & Hobbies
               </Typography>
               <Box display="flex" flexWrap="wrap" gap={1}>
                 {user.interests.map((interest) => (
                   <Chip key={interest} label={interest} color="primary" variant="outlined" />
                 ))}
               </Box>
-              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-                Your Hobbies
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Majors */}
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Your Majors
               </Typography>
               <Box display="flex" flexWrap="wrap" gap={1}>
-                {user.hobbies.map((hobby) => (
-                  <Chip key={hobby} label={hobby} color="secondary" variant="outlined" />
+                {user.majors.map((major) => (
+                  <Chip key={major} label={major} color="secondary" variant="outlined" />
                 ))}
               </Box>
             </CardContent>

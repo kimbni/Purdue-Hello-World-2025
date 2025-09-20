@@ -3,7 +3,7 @@ import { Container, AppBar, Toolbar, Typography, Box, Tabs, Tab } from '@mui/mat
 import { User, HangoutSuggestion } from './types';
 import Dashboard from './components/Dashboard';
 import ScheduleManager from './components/ScheduleManager';
-import InterestsManager from './components/InterestsManager';
+import InfoManager from './components/InfoManager';
 import HangoutSuggestions from './components/HangoutSuggestions';
 import BuddiesManager from './components/BuddiesManager';
 
@@ -44,8 +44,8 @@ function App() {
       id: '1',
       name: 'Alex Johnson',
       email: 'alex@example.com',
-      interests: ['Gaming', 'Movies', 'Coffee', 'Hiking'],
-      hobbies: ['Photography', 'Cooking', 'Board Games'],
+      interests: ['Gaming', 'Movies', 'Coffee', 'Hiking', 'Photography', 'Cooking', 'Board Games'],
+      majors: ['Computer Science', 'Mathematics'],
       schedule: [
         {
           id: '1',
@@ -211,7 +211,7 @@ function App() {
                   }
                 }}
                >
-                 Interests & Hobbies
+                 My Info
                </button>
                <div style={{ width: '1px', height: '20px', backgroundColor: '#603275', margin: '0 8px' }}></div>
                <button 
@@ -303,7 +303,7 @@ function App() {
         </TabPanel>
         
         <TabPanel value={tabValue} index={2}>
-          <InterestsManager user={currentUser} onUpdateUser={setCurrentUser} />
+          <InfoManager user={currentUser} onUpdateUser={setCurrentUser} />
         </TabPanel>
         
         <TabPanel value={tabValue} index={3}>
