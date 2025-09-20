@@ -38,7 +38,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Welcome back, {user.name}!
+        🎉 Welcome back, {user.name}!
       </Typography>
       
       <Grid container spacing={3}>
