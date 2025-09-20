@@ -76,10 +76,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
                 <Group color="success" sx={{ mr: 1 }} />
-                <Typography variant="h6">Friends</Typography>
+                <Typography variant="h6">Buddies</Typography>
               </Box>
               <Typography variant="h3" color="success.main">
-                {user.friends.length}
+                {user.buddies.length}
               </Typography>
             </CardContent>
           </Card>

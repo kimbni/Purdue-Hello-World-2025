@@ -1,7 +1,7 @@
 {
-  "name": "hangout-planner",
+  "name": "syncup",
   "version": "1.0.0",
-  "description": "AI-powered hangout planning app for friends",
+  "description": "AI-powered hangout planning app for buddies",
   "private": true,
   "dependencies": {
     "@types/node": "^20.0.0",

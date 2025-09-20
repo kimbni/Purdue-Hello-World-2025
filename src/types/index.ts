@@ -5,7 +5,7 @@ export interface User {
   interests: string[];
   hobbies: string[];
   schedule: ClassSchedule[];
-  friends: string[];
+  buddies: string[];
 }
 
 export interface ClassSchedule {

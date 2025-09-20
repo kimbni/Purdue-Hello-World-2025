@@ -22,24 +22,24 @@ import {
 import { Add, Delete, Person, Email } from '@mui/icons-material';
 import { User } from '../types';
 
-interface FriendsManagerProps {
+interface BuddiesManagerProps {
   user: User;
   onUpdateUser: (user: User) => void;
 }
 
-const FriendsManager: React.FC<FriendsManagerProps> = ({ user, onUpdateUser }) => {
+const BuddiesManager: React.FC<BuddiesManagerProps> = ({ user, onUpdateUser }) => {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
 
-  // Mock friends data - in a real app, this would come from a database
-  const friendsData = {
+  // Mock buddies data - in a real app, this would come from a database
+  const buddiesData = {
     '2': { name: 'Sarah Chen', email: 'sarah@example.com', status: 'online' },
     '3': { name: 'Mike Rodriguez', email: 'mike@example.com', status: 'offline' },
     '4': { name: 'Emma Wilson', email: 'emma@example.com', status: 'online' }
   };
 
-  const handleAddFriend = () => {
+  const handleAddBuddy = () => {
     if (!email.trim()) {
       setMessage('Please enter an email address');
       return;
@@ -51,10 +51,10 @@ const FriendsManager: React.FC<FriendsManagerProps> = ({ user, onUpdateUser }) =
     setTimeout(() => setMessage(''), 3000);
   };
 
-  const handleRemoveFriend = (friendId: string) => {
+  const handleRemoveBuddy = (buddyId: string) => {
     onUpdateUser({
       ...user,
-      friends: user.friends.filter(id => id !== friendId)
+      buddies: user.buddies.filter(id => id !== buddyId)
     });
   };
 
@@ -65,13 +65,13 @@ const FriendsManager: React.FC<FriendsManagerProps> = ({ user, onUpdateUser }) =
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">Friends</Typography>
+        <Typography variant="h4">Buddies</Typography>
         <Button
           variant="contained"
           startIcon={<Add />}
           onClick={() => setOpen(true)}
         >
-          Add Friend
+          Add Buddy
         </Button>
       </Box>
 
@@ -82,20 +82,20 @@ const FriendsManager: React.FC<FriendsManagerProps> = ({ user, onUpdateUser }) =
       )}
 
       <Grid container spacing={2}>
-        {user.friends.map((friendId) => {
-          const friend = friendsData[friendId as keyof typeof friendsData];
-          if (!friend) return null;
+        {user.buddies.map((buddyId) => {
+          const buddy = buddiesData[buddyId as keyof typeof buddiesData];
+          if (!buddy) return null;
 
           return (
-            <Grid item xs={12} md={6} key={friendId}>
+            <Grid item xs={12} md={6} key={buddyId}>
               <Card>
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={2}>
                     <Person color="primary" sx={{ mr: 1 }} />
-                    <Typography variant="h6">{friend.name}</Typography>
+                    <Typography variant="h6">{buddy.name}</Typography>
                     <Chip
-                      label={friend.status}
-                      color={getStatusColor(friend.status) as any}
+                      label={buddy.status}
+                      color={getStatusColor(buddy.status) as any}
                       size="small"
                       sx={{ ml: 'auto' }}
                     />
@@ -104,7 +104,7 @@ const FriendsManager: React.FC<FriendsManagerProps> = ({ user, onUpdateUser }) =
                   <Box display="flex" alignItems="center" mb={2}>
                     <Email fontSize="small" color="action" />
                     <Typography variant="body2" sx={{ ml: 1 }}>
-                      {friend.email}
+                      {buddy.email}
                     </Typography>
                   </Box>
                   
@@ -112,9 +112,9 @@ const FriendsManager: React.FC<FriendsManagerProps> = ({ user, onUpdateUser }) =
                     size="small"
                     color="error"
                     startIcon={<Delete />}
-                    onClick={() => handleRemoveFriend(friendId)}
+                    onClick={() => handleRemoveBuddy(buddyId)}
                   >
-                    Remove Friend
+                    Remove Buddy
                   </Button>
                 </CardContent>
               </Card>
@@ -123,29 +123,29 @@ const FriendsManager: React.FC<FriendsManagerProps> = ({ user, onUpdateUser }) =
         })}
       </Grid>
 
-      {user.friends.length === 0 && (
+      {user.buddies.length === 0 && (
         <Card>
           <CardContent>
             <Typography variant="h6" align="center" color="text.secondary">
-              No friends yet
+              No buddies yet
             </Typography>
             <Typography variant="body2" align="center" color="text.secondary">
-              Add friends by their email address to start planning hangouts together!
+              Add buddies by their email address to start planning hangouts together!
             </Typography>
           </CardContent>
         </Card>
       )}
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add Friend</DialogTitle>
+        <DialogTitle>Add Buddy</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
-            label="Friend's Email"
+            label="Buddy's Email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your friend's email address"
+            placeholder="Enter your buddy's email address"
             sx={{ mt: 2 }}
           />
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
@@ -154,7 +154,7 @@ const FriendsManager: React.FC<FriendsManagerProps> = ({ user, onUpdateUser }) =
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={handleAddFriend} variant="contained">
+          <Button onClick={handleAddBuddy} variant="contained">
             Send Invitation
           </Button>
         </DialogActions>
@@ -163,4 +163,4 @@ const FriendsManager: React.FC<FriendsManagerProps> = ({ user, onUpdateUser }) =
   );
 };
 
-export default FriendsManager;
+export default BuddiesManager;

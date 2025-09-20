@@ -5,7 +5,7 @@ import Dashboard from './components/Dashboard';
 import ScheduleManager from './components/ScheduleManager';
 import InterestsManager from './components/InterestsManager';
 import HangoutSuggestions from './components/HangoutSuggestions';
-import FriendsManager from './components/FriendsManager';
+import BuddiesManager from './components/BuddiesManager';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -64,7 +64,7 @@ function App() {
           location: 'Building B, Room 205'
         }
       ],
-      friends: ['2', '3']
+      buddies: ['2', '3']
     };
     setCurrentUser(demoUser);
   }, []);
@@ -82,7 +82,7 @@ function App() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Hangout Planner
+            SyncUp
           </Typography>
           <Typography variant="body2">
             Welcome, {currentUser.name}!
@@ -97,7 +97,7 @@ function App() {
             <Tab label="My Schedule" />
             <Tab label="Interests & Hobbies" />
             <Tab label="Hangout Suggestions" />
-            <Tab label="Friends" />
+            <Tab label="Buddies" />
           </Tabs>
         </Box>
         
@@ -122,7 +122,7 @@ function App() {
         </TabPanel>
         
         <TabPanel value={tabValue} index={4}>
-          <FriendsManager user={currentUser} onUpdateUser={setCurrentUser} />
+          <BuddiesManager user={currentUser} onUpdateUser={setCurrentUser} />
         </TabPanel>
       </Container>
     </Box>

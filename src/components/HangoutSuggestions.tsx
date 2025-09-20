@@ -94,7 +94,7 @@ const HangoutSuggestions: React.FC<HangoutSuggestionsProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-  const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
+  const [selectedBuddies, setSelectedBuddies] = useState<string[]>([]);
   const [suggestedDate, setSuggestedDate] = useState('');
   const [suggestedTime, setSuggestedTime] = useState('');
 
@@ -102,8 +102,8 @@ const HangoutSuggestions: React.FC<HangoutSuggestionsProps> = ({
   const generateAISuggestions = () => {
     const newSuggestions: HangoutSuggestion[] = [];
     
-    // Find common interests with friends
-    const commonInterests = user.interests; // In a real app, this would compare with friends' interests
+    // Find common interests with buddies
+    const commonInterests = user.interests; // In a real app, this would compare with buddies' interests
     
     // Generate suggestions based on interests
     commonInterests.forEach(interest => {
@@ -116,13 +116,13 @@ const HangoutSuggestions: React.FC<HangoutSuggestionsProps> = ({
         const activity = matchingActivities[0];
         const suggestion: HangoutSuggestion = {
           id: uuidv4(),
-          title: `${activity.name} with Friends`,
+          title: `${activity.name} with Buddies`,
           description: activity.description,
           location: activity.location,
           suggestedTime: new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000), // Random time in next week
           duration: activity.duration,
           activity: activity.name,
-          participants: user.friends,
+          participants: user.buddies,
           status: 'pending',
           responses: {},
           createdBy: 'ai',
@@ -170,19 +170,19 @@ const HangoutSuggestions: React.FC<HangoutSuggestionsProps> = ({
   };
 
   const handleCreateSuggestion = () => {
-    if (!selectedActivity || selectedFriends.length === 0 || !suggestedDate || !suggestedTime) {
+    if (!selectedActivity || selectedBuddies.length === 0 || !suggestedDate || !suggestedTime) {
       return;
     }
 
     const suggestion: HangoutSuggestion = {
       id: uuidv4(),
-      title: `${selectedActivity.name} with Friends`,
+      title: `${selectedActivity.name} with Buddies`,
       description: selectedActivity.description,
       location: selectedActivity.location,
       suggestedTime: new Date(`${suggestedDate}T${suggestedTime}`),
       duration: selectedActivity.duration,
       activity: selectedActivity.name,
-      participants: selectedFriends,
+      participants: selectedBuddies,
       status: 'pending',
       responses: {},
       createdBy: user.id,
@@ -192,7 +192,7 @@ const HangoutSuggestions: React.FC<HangoutSuggestionsProps> = ({
     onUpdateSuggestions([...suggestions, suggestion]);
     setOpen(false);
     setSelectedActivity(null);
-    setSelectedFriends([]);
+    setSelectedBuddies([]);
     setSuggestedDate('');
     setSuggestedTime('');
   };
@@ -344,15 +344,15 @@ const HangoutSuggestions: React.FC<HangoutSuggestionsProps> = ({
             
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel>Friends</InputLabel>
+                <InputLabel>Buddies</InputLabel>
                 <Select
                   multiple
-                  value={selectedFriends}
-                  onChange={(e) => setSelectedFriends(e.target.value as string[])}
+                  value={selectedBuddies}
+                  onChange={(e) => setSelectedBuddies(e.target.value as string[])}
                 >
-                  {user.friends.map((friendId) => (
-                    <MenuItem key={friendId} value={friendId}>
-                      Friend {friendId}
+                  {user.buddies.map((buddyId) => (
+                    <MenuItem key={buddyId} value={buddyId}>
+                      Buddy {buddyId}
                     </MenuItem>
                   ))}
                 </Select>
