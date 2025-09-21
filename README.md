@@ -59,7 +59,7 @@ PORT=5000
 CLIENT_URL=http://localhost:3000
 
 # MongoDB Configuration
-MONGODB_URI=mongodb+srv://wukimberley98_db_user:eSERpU2flXDh3pVu@helloworldcluster.nsxxcfd.mongodb.net/?retryWrites=true&w=majority&appName=HelloWorldCluster
+MONGODB_URI=your-mongodb-connection-string-here
 
 # Auth0 Configuration
 AUTH0_SECRET=a long, randomly-generated string stored in env
