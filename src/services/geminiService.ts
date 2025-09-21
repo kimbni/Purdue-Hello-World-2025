@@ -91,13 +91,14 @@ ${majorGuidance}
 
 ${interestGuidance}
 
-Please suggest ONE creative, personalized hangout activity that DIRECTLY connects to their academic and personal interests. The activity should:
+Please suggest ONE creative, personalized GROUP HANGOUT ACTIVITY that DIRECTLY connects to their academic and personal interests. The activity should:
 1. DIRECTLY relate to their major(s): ${majors}
 2. DIRECTLY relate to their interests: ${interests}
 3. Be appropriate for Purdue University students in West Lafayette, Indiana
-4. Work well for a group of ${buddyCount + 1} people (including the user)
+4. Work well for a GROUP of ${buddyCount + 1} people (including the user)
 5. Be feasible and accessible for college students
 6. Be engaging and educational/fun
+7. **CRITICAL: This must be a GROUP ACTIVITY/HANGOUT, NOT a solo project or individual work**
 
 Respond in this EXACT JSON format:
 {
@@ -116,6 +117,24 @@ Make sure the activity is:
 - Feasible in the West Lafayette/Purdue area
 - Not already suggested (avoid: ${usedActivities.join(', ')})
 - Engaging and educational
+- **A GROUP HANGOUT ACTIVITY** - NOT a solo project, individual assignment, or personal work
+- **COLLABORATIVE** - requires multiple people working together
+- **SOCIAL** - involves interaction and teamwork between group members
+
+**FORBIDDEN ACTIVITIES:**
+- Solo projects or individual work
+- Personal assignments or homework
+- Activities that can be done alone
+- Individual study sessions
+- Solo coding projects
+- Personal research
+
+**REQUIRED ACTIVITIES:**
+- Group hangouts and social activities
+- Collaborative projects requiring teamwork
+- Interactive group experiences
+- Social bonding activities
+- Team-based challenges or competitions
 
 Duration should be in minutes (60-300 range).`;
   }
@@ -127,27 +146,27 @@ Duration should be in minutes (60-300 range).`;
       const lowerMajor = major.toLowerCase();
       
       if (lowerMajor.includes('computer') || lowerMajor.includes('cs') || lowerMajor.includes('software')) {
-        guidance.push(`- For Computer Science/Software Engineering: Suggest tech-related activities like coding challenges, hackathons, tech meetups, programming workshops, AI/ML projects, game development, or tech company visits`);
+        guidance.push(`- For Computer Science/Software Engineering: Suggest GROUP tech activities like collaborative coding challenges, team hackathons, group programming workshops, multiplayer game development sessions, or group tech meetups`);
       } else if (lowerMajor.includes('engineering')) {
-        guidance.push(`- For Engineering: Suggest hands-on engineering activities like building projects, engineering competitions, maker spaces, robotics, or engineering workshops`);
+        guidance.push(`- For Engineering: Suggest GROUP engineering activities like team building projects, collaborative engineering competitions, group maker space sessions, team robotics challenges, or group engineering workshops`);
       } else if (lowerMajor.includes('business') || lowerMajor.includes('management')) {
-        guidance.push(`- For Business/Management: Suggest business-related activities like case study competitions, networking events, startup workshops, or business simulations`);
+        guidance.push(`- For Business/Management: Suggest GROUP business activities like team case study competitions, group networking events, collaborative startup workshops, or team business simulations`);
       } else if (lowerMajor.includes('math') || lowerMajor.includes('mathematics')) {
-        guidance.push(`- For Mathematics: Suggest math-related activities like puzzle competitions, mathematical modeling, statistics projects, or math games`);
+        guidance.push(`- For Mathematics: Suggest GROUP math activities like team puzzle competitions, collaborative mathematical modeling, group statistics projects, or team math games`);
       } else if (lowerMajor.includes('physics')) {
-        guidance.push(`- For Physics: Suggest physics-related activities like science experiments, physics demonstrations, astronomy, or science museum visits`);
+        guidance.push(`- For Physics: Suggest GROUP physics activities like collaborative science experiments, team physics demonstrations, group astronomy sessions, or team science museum visits`);
       } else if (lowerMajor.includes('biology') || lowerMajor.includes('life')) {
-        guidance.push(`- For Biology/Life Sciences: Suggest biology-related activities like nature walks, lab experiments, biology competitions, or science outreach`);
+        guidance.push(`- For Biology/Life Sciences: Suggest GROUP biology activities like collaborative nature walks, team lab experiments, group biology competitions, or team science outreach`);
       } else if (lowerMajor.includes('chemistry')) {
-        guidance.push(`- For Chemistry: Suggest chemistry-related activities like chemistry experiments, lab tours, chemistry competitions, or science demonstrations`);
+        guidance.push(`- For Chemistry: Suggest GROUP chemistry activities like collaborative chemistry experiments, team lab tours, group chemistry competitions, or team science demonstrations`);
       } else if (lowerMajor.includes('english') || lowerMajor.includes('literature')) {
-        guidance.push(`- For English/Literature: Suggest literature-related activities like book clubs, writing workshops, poetry readings, or literary discussions`);
+        guidance.push(`- For English/Literature: Suggest GROUP literature activities like collaborative book clubs, team writing workshops, group poetry readings, or team literary discussions`);
       } else if (lowerMajor.includes('psychology')) {
-        guidance.push(`- For Psychology: Suggest psychology-related activities like psychology experiments, mental health awareness events, or psychology discussions`);
+        guidance.push(`- For Psychology: Suggest GROUP psychology activities like collaborative psychology experiments, team mental health awareness events, or group psychology discussions`);
       } else if (lowerMajor.includes('communication')) {
-        guidance.push(`- For Communication: Suggest communication-related activities like public speaking practice, media production, or communication workshops`);
+        guidance.push(`- For Communication: Suggest GROUP communication activities like collaborative public speaking practice, team media production, or group communication workshops`);
       } else {
-        guidance.push(`- For ${major}: Suggest activities that relate to ${major} field of study, such as professional development, field-specific projects, or academic competitions`);
+        guidance.push(`- For ${major}: Suggest GROUP activities that relate to ${major} field of study, such as collaborative professional development, team field-specific projects, or group academic competitions`);
       }
     });
     
@@ -161,27 +180,27 @@ Duration should be in minutes (60-300 range).`;
       const lowerInterest = interest.toLowerCase();
       
       if (lowerInterest.includes('technology') || lowerInterest.includes('tech')) {
-        guidance.push(`- For Technology interest: Include tech elements like coding, AI, gadgets, tech talks, or digital projects`);
+        guidance.push(`- For Technology interest: Include GROUP tech elements like collaborative coding, team AI projects, group gadget exploration, team tech talks, or collaborative digital projects`);
       } else if (lowerInterest.includes('gaming') || lowerInterest.includes('game')) {
-        guidance.push(`- For Gaming interest: Include gaming elements like game development, gaming tournaments, esports, or gaming cafes`);
+        guidance.push(`- For Gaming interest: Include GROUP gaming elements like collaborative game development, team gaming tournaments, group esports, or group gaming cafe visits`);
       } else if (lowerInterest.includes('music')) {
-        guidance.push(`- For Music interest: Include music elements like concerts, music production, jam sessions, or music events`);
+        guidance.push(`- For Music interest: Include GROUP music elements like collaborative concerts, team music production, group jam sessions, or group music events`);
       } else if (lowerInterest.includes('sports') || lowerInterest.includes('athletic')) {
-        guidance.push(`- For Sports interest: Include sports elements like team sports, fitness activities, sports events, or athletic competitions`);
+        guidance.push(`- For Sports interest: Include GROUP sports elements like team sports, group fitness activities, team sports events, or group athletic competitions`);
       } else if (lowerInterest.includes('art') || lowerInterest.includes('creative')) {
-        guidance.push(`- For Art/Creative interest: Include creative elements like art projects, creative workshops, galleries, or artistic activities`);
+        guidance.push(`- For Art/Creative interest: Include GROUP creative elements like collaborative art projects, group creative workshops, team gallery visits, or group artistic activities`);
       } else if (lowerInterest.includes('science') || lowerInterest.includes('research')) {
-        guidance.push(`- For Science/Research interest: Include scientific elements like experiments, research projects, science talks, or lab activities`);
+        guidance.push(`- For Science/Research interest: Include GROUP scientific elements like collaborative experiments, team research projects, group science talks, or group lab activities`);
       } else if (lowerInterest.includes('reading') || lowerInterest.includes('books')) {
-        guidance.push(`- For Reading/Books interest: Include literary elements like book clubs, reading groups, literary events, or library activities`);
+        guidance.push(`- For Reading/Books interest: Include GROUP literary elements like collaborative book clubs, group reading sessions, team literary events, or group library activities`);
       } else if (lowerInterest.includes('outdoor') || lowerInterest.includes('nature')) {
-        guidance.push(`- For Outdoor/Nature interest: Include outdoor elements like hiking, nature walks, outdoor sports, or environmental activities`);
+        guidance.push(`- For Outdoor/Nature interest: Include GROUP outdoor elements like group hiking, team nature walks, group outdoor sports, or team environmental activities`);
       } else if (lowerInterest.includes('food') || lowerInterest.includes('cooking')) {
-        guidance.push(`- For Food/Cooking interest: Include culinary elements like cooking classes, food tours, restaurant visits, or culinary experiments`);
+        guidance.push(`- For Food/Cooking interest: Include GROUP culinary elements like collaborative cooking classes, group food tours, team restaurant visits, or group culinary experiments`);
       } else if (lowerInterest.includes('travel') || lowerInterest.includes('adventure')) {
-        guidance.push(`- For Travel/Adventure interest: Include adventure elements like exploring new places, adventure activities, or travel planning`);
+        guidance.push(`- For Travel/Adventure interest: Include GROUP adventure elements like collaborative exploration, group adventure activities, or team travel planning`);
       } else {
-        guidance.push(`- For ${interest} interest: Include elements related to ${interest}, such as ${interest}-focused activities, workshops, or events`);
+        guidance.push(`- For ${interest} interest: Include GROUP elements related to ${interest}, such as collaborative ${interest}-focused activities, group workshops, or team events`);
       }
     });
     
@@ -260,8 +279,8 @@ Duration should be in minutes (60-300 range).`;
       if (majors.some(m => m.includes('computer') || m.includes('cs')) || 
           interests.some(i => i.includes('technology') || i.includes('gaming'))) {
         return {
-          activity: 'Tech Study Group',
-          description: 'Collaborative coding session focusing on current coursework and tech projects',
+          activity: 'Group Tech Study Session',
+          description: 'Collaborative coding session with your study group focusing on current coursework and tech projects',
           location: 'Purdue CS Building Study Room',
           duration: 150,
           category: 'Study',
@@ -272,8 +291,8 @@ Duration should be in minutes (60-300 range).`;
       // Check for engineering major
       if (majors.some(m => m.includes('engineering'))) {
         return {
-          activity: 'Engineering Project Workshop',
-          description: 'Hands-on engineering project session with your study group',
+          activity: 'Team Engineering Project Workshop',
+          description: 'Collaborative hands-on engineering project session with your study group',
           location: 'Purdue Engineering Building',
           duration: 180,
           category: 'Study',
@@ -284,8 +303,8 @@ Duration should be in minutes (60-300 range).`;
       // Check for music interest
       if (interests.some(i => i.includes('music'))) {
         return {
-          activity: 'Music Jam Session',
-          description: 'Collaborative music making session with friends',
+          activity: 'Group Music Jam Session',
+          description: 'Collaborative music making session with friends - bring instruments and create together',
           location: 'Purdue Music Building or Student Union',
           duration: 120,
           category: 'Entertainment',
@@ -294,25 +313,25 @@ Duration should be in minutes (60-300 range).`;
       }
     }
     
-    // Default fallback activities
+    // Default fallback activities - all group activities
     const fallbackActivities = [
       {
-        activity: 'Coffee & Study Session',
-        description: 'Grab coffee and study together at a local cafe',
+        activity: 'Group Coffee & Study Session',
+        description: 'Grab coffee and study together as a group at a local cafe',
         location: 'Local Coffee Shop',
         duration: 120,
         category: 'Study'
       },
       {
-        activity: 'Campus Exploration',
-        description: 'Take a walk around campus and discover new spots',
+        activity: 'Group Campus Exploration',
+        description: 'Take a group walk around campus and discover new spots together',
         location: 'Purdue Campus',
         duration: 90,
         category: 'Outdoor'
       },
       {
-        activity: 'Study Group Session',
-        description: 'Collaborative study session with your buddies',
+        activity: 'Collaborative Study Group Session',
+        description: 'Team study session with your buddies - work on assignments together',
         location: 'Purdue Library',
         duration: 150,
         category: 'Study'
