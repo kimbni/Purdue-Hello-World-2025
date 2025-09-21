@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   Container, 
   Paper, 
@@ -7,45 +7,16 @@ import {
   Box,
   Card,
   CardContent,
-  CardActions,
-  CircularProgress // Import CircularProgress for loading state
+  CardActions
 } from '@mui/material';
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage: React.FC = () => {
-  // Destructure isLoading, error, and loginWithRedirect for more control
-  const { loginWithRedirect, isLoading, error } = useAuth0();
+  const { login } = useAuth();
 
-  // Local state to manage the button's loading state after a click
-  const [isRedirecting, setIsRedirecting] = useState(false);
-
-  // Handler to set loading state before redirecting
-  const handleLogin = async () => {
-    setIsRedirecting(true);
-    await loginWithRedirect();
-    // Note: The user will be redirected, so setIsRedirecting(false) is not strictly necessary.
+  const handleLogin = () => {
+    login();
   };
-
-  // 1. Handle SDK Initial Loading State ⏳
-  // Shows a spinner while the Auth0 provider is initializing
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  // 2. Handle Authentication Errors ❗
-  // Displays an error message if something went wrong
-  if (error) {
-    return (
-      <Container maxWidth="sm" sx={{ mt: 8, textAlign: 'center' }}>
-        <Typography variant="h5" color="error">Authentication Error</Typography>
-        <Typography color="error" sx={{ mt: 2 }}>Oops... {error.message}</Typography>
-      </Container>
-    );
-  }
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
@@ -89,7 +60,6 @@ const LoginPage: React.FC = () => {
               variant="contained" 
               size="large"
               onClick={handleLogin}
-              disabled={isRedirecting} // Disable button when redirecting
               sx={{
                 backgroundColor: '#775287',
                 color: 'white',
@@ -102,24 +72,10 @@ const LoginPage: React.FC = () => {
                 textTransform: 'none',
                 '&:hover': {
                   backgroundColor: '#603275',
-                },
-                position: 'relative', // Needed for spinner positioning
+                }
               }}
             >
-              {isRedirecting ? 'Redirecting...' : 'Sign In'}
-              {isRedirecting && ( // 3. Show a spinner on the button itself
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    color: 'white',
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: '-12px',
-                    marginLeft: '-12px',
-                  }}
-                />
-              )}
+              Sign In
             </Button>
           </CardActions>
         </Card>

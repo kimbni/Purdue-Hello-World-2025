@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Auth0Provider } from '@auth0/auth0-react';
 import App from './App';
 
 
@@ -96,17 +95,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <Auth0Provider
-      domain="dev-rcbo7an8pg7847wt.us.auth0.com"
-      clientId="Z0BsTz8f76UtQnaFckAjHA8M9aMxBGGz"
-      authorizationParams={{
-        redirect_uri: window.location.origin
-      }}
-    >
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
-      </ThemeProvider>
-    </Auth0Provider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <App />
+    </ThemeProvider>
   </React.StrictMode>
 );

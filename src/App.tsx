@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, AppBar, Toolbar, Typography, Box, Tabs, Tab, Button } from '@mui/material';
 import { User, HangoutSuggestion } from './types';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth, AuthProvider } from './contexts/AuthContext';
 import Dashboard from './components/Dashboard';
 import ScheduleManager from './components/ScheduleManager';
 import InfoManager from './components/InfoManager';
@@ -36,7 +36,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-function App() {
+function AppContent() {
   const { user, isLoading, isAuthenticated, logout, updateUser } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [suggestions, setSuggestions] = useState<HangoutSuggestion[]>([]);
@@ -349,6 +349,14 @@ function App() {
         </TabPanel>
       </Container>
     </Box>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
