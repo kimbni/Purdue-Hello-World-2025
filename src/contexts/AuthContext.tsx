@@ -23,27 +23,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
   const checkAuthStatus = useCallback(async () => {
-    // Check if we have a user in localStorage (for demo mode)
-    const savedUser = localStorage.getItem('demoUser');
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        // Convert Date strings back to Date objects for suggestions
-        if (userData.suggestions) {
-          userData.suggestions = userData.suggestions.map((suggestion: any) => ({
-            ...suggestion,
-            suggestedTime: new Date(suggestion.suggestedTime),
-            createdAt: new Date(suggestion.createdAt)
-          }));
+    // Check if this is the first ever run (no sessionStorage flag)
+    const hasRunBefore = sessionStorage.getItem('appHasRun');
+    
+    if (!hasRunBefore) {
+      // First ever run - clear all data and set flag
+      localStorage.removeItem('demoUser');
+      sessionStorage.setItem('appHasRun', 'true');
+    } else {
+      // Subsequent runs (reloads) - restore user data if it exists
+      const savedUser = localStorage.getItem('demoUser');
+      if (savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          // Convert Date strings back to Date objects for suggestions
+          if (userData.suggestions) {
+            userData.suggestions = userData.suggestions.map((suggestion: any) => ({
+              ...suggestion,
+              suggestedTime: new Date(suggestion.suggestedTime),
+              createdAt: new Date(suggestion.createdAt)
+            }));
+          }
+          setUser(userData);
+          setIsLoading(false);
+          return;
+        } catch (error) {
+          console.error('Error parsing saved user:', error);
         }
-        setUser(userData);
-        setIsLoading(false);
-        return;
-      } catch (error) {
-        console.error('Error parsing saved user:', error);
       }
     }
-
+    
     // For demo mode, skip API calls and just set loading to false
     if (API_BASE_URL.includes('localhost') || !process.env.REACT_APP_API_URL) {
       setUser(null);

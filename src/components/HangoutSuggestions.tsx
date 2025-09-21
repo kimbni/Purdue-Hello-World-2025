@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -6,11 +6,6 @@ import {
   Button,
   Box,
   Chip,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -20,7 +15,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Alert,
   Grid
 } from '@mui/material';
 import {
@@ -35,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import { User, HangoutSuggestion, Activity } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { geminiService } from '../services/geminiService';
 
 interface HangoutSuggestionsProps {
   user: User;
@@ -295,8 +290,41 @@ const HangoutSuggestions: React.FC<HangoutSuggestionsProps> = ({
   const [suggestedDate, setSuggestedDate] = useState('');
   const [suggestedTime, setSuggestedTime] = useState('');
 
-  // Generate AI suggestions based on user data
+  // Generate AI suggestions using Gemini
   const generateAISuggestions = async () => {
+    try {
+      // Use Gemini to generate personalized activity suggestions
+      const geminiSuggestion = await geminiService.generateActivitySuggestions(
+        user, 
+        suggestions, 
+        user.buddies.length
+      );
+      
+      const newSuggestion: HangoutSuggestion = {
+        id: uuidv4(),
+        title: geminiSuggestion.activity,
+        description: geminiSuggestion.description,
+        location: geminiSuggestion.location,
+        suggestedTime: geminiSuggestion.suggestedTime,
+        duration: geminiSuggestion.duration,
+        activity: geminiSuggestion.activity,
+        participants: user.buddies,
+        status: 'pending',
+        responses: {},
+        createdBy: 'ai',
+        createdAt: new Date()
+      };
+      
+      await onUpdateSuggestions([...suggestions, newSuggestion]);
+    } catch (error) {
+      console.error('Error generating AI suggestions:', error);
+      // Fallback to original method if Gemini fails
+      await generateFallbackSuggestions();
+    }
+  };
+
+  // Fallback method using the original logic
+  const generateFallbackSuggestions = async () => {
     // Get user's interests and majors for better matching
     const userInterests = user.interests.map(interest => interest.toLowerCase());
     const userMajors = user.majors.map(major => major.toLowerCase());
