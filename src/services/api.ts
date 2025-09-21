@@ -3,12 +3,20 @@ import { User, HangoutSuggestion } from '../types';
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 class ApiService {
+  private token: string | null = null;
+
+  setToken(token: string) {
+    this.token = token;
+  }
+
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
+    
     const config: RequestInit = {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        ...(this.token && { 'Authorization': `Bearer ${this.token}` }),
         ...options.headers,
       },
       ...options,
