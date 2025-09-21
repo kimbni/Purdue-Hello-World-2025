@@ -1,1 +1,11 @@
 /node_modules
+/server/node_modules
+/server/package-lock.json
+/server/package.json
+/server/server.js
+/server/server.js.map
+/server/server.js.map.gz
+/server/server.js.map.gz.br
+/server/server.js.map.gz.br.gz
+/server/server.js.map.gz.br.gz.br
+/server/server.js.map.gz.br.gz.br.gz

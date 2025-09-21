@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Box, Tabs, Tab } from '@mui/material';
+import { Container, AppBar, Toolbar, Typography, Box, Tabs, Tab, Button } from '@mui/material';
 import { User, HangoutSuggestion } from './types';
+import { useAuth } from './contexts/AuthContext';
 import Dashboard from './components/Dashboard';
 import ScheduleManager from './components/ScheduleManager';
 import InfoManager from './components/InfoManager';
 import HangoutSuggestions from './components/HangoutSuggestions';
 import BuddiesManager from './components/BuddiesManager';
+import LoginPage from './components/LoginPage';
+import { apiService } from './services/api';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -34,47 +37,55 @@ function TabPanel(props: TabPanelProps) {
 }
 
 function App() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { user, isLoading, isAuthenticated, logout, updateUser } = useAuth();
   const [tabValue, setTabValue] = useState(0);
   const [suggestions, setSuggestions] = useState<HangoutSuggestion[]>([]);
 
   useEffect(() => {
-    // Initialize with demo user data
-    const demoUser: User = {
-      id: '1',
-      name: 'Alex Johnson',
-      email: 'alex@example.com',
-      interests: ['Gaming', 'Movies', 'Coffee', 'Hiking', 'Photography', 'Cooking', 'Board Games'],
-      majors: ['Computer Science', 'Mathematics'],
-      schedule: [
-        {
-          id: '1',
-          name: 'Computer Science 101',
-          dayOfWeek: 1,
-          startTime: '09:00',
-          endTime: '10:30',
-          location: 'Building A, Room 101'
-        },
-        {
-          id: '2',
-          name: 'Mathematics 201',
-          dayOfWeek: 3,
-          startTime: '14:00',
-          endTime: '15:30',
-          location: 'Building B, Room 205'
-        }
-      ],
-      buddies: ['2', '3']
-    };
-    setCurrentUser(demoUser);
-  }, []);
+    if (isAuthenticated && user) {
+      loadSuggestions();
+    }
+  }, [isAuthenticated, user]);
+
+  const loadSuggestions = async () => {
+    try {
+      const userSuggestions = await apiService.getSuggestions();
+      setSuggestions(userSuggestions);
+    } catch (error) {
+      console.error('Error loading suggestions:', error);
+    }
+  };
+
+  const handleUpdateUser = async (userData: Partial<User>) => {
+    try {
+      await updateUser(userData);
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  if (!currentUser) {
-    return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Typography variant="h6">Loading...</Typography>
+      </Box>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  if (!user) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Typography variant="h6">Error loading user data</Typography>
+      </Box>
+    );
   }
 
   return (
@@ -270,7 +281,7 @@ function App() {
             </div>
             
             <div 
-              className="px-3 py-1"
+              className="px-3 py-1 me-3"
               style={{ 
                 backgroundColor: '#e6e1d8',
                 borderRadius: '10px',
@@ -285,9 +296,28 @@ function App() {
                   fontSize: '0.9rem'
                 }}
               >
-            Welcome, {currentUser.name}!
+            Welcome, {user.name}!
               </span>
             </div>
+            
+            <Button
+              variant="outlined"
+              onClick={logout}
+              sx={{
+                color: '#e6e1d8',
+                borderColor: 'rgba(195, 140, 219, 0.5)',
+                borderRadius: '10px',
+                fontFamily: '"Inter", "Segoe UI", "Roboto", sans-serif',
+                fontSize: '0.8rem',
+                textTransform: 'none',
+                '&:hover': {
+                  borderColor: '#e6e1d8',
+                  backgroundColor: 'rgba(195, 140, 219, 0.1)'
+                }
+              }}
+            >
+              Logout
+            </Button>
           </div>
         </div>
       </nav>
@@ -295,27 +325,27 @@ function App() {
       <Container maxWidth="lg" sx={{ mt: 4 }}>
         
         <TabPanel value={tabValue} index={0}>
-          <Dashboard user={currentUser} suggestions={suggestions} />
+          <Dashboard user={user} suggestions={suggestions} />
         </TabPanel>
         
         <TabPanel value={tabValue} index={1}>
-          <ScheduleManager user={currentUser} onUpdateUser={setCurrentUser} />
+          <ScheduleManager user={user} onUpdateUser={handleUpdateUser} />
         </TabPanel>
         
         <TabPanel value={tabValue} index={2}>
-          <InfoManager user={currentUser} onUpdateUser={setCurrentUser} />
+          <InfoManager user={user} onUpdateUser={handleUpdateUser} />
         </TabPanel>
         
         <TabPanel value={tabValue} index={3}>
           <HangoutSuggestions 
-            user={currentUser} 
+            user={user} 
             suggestions={suggestions}
             onUpdateSuggestions={setSuggestions}
           />
         </TabPanel>
         
         <TabPanel value={tabValue} index={4}>
-          <BuddiesManager user={currentUser} onUpdateUser={setCurrentUser} />
+          <BuddiesManager user={user} onUpdateUser={handleUpdateUser} />
         </TabPanel>
       </Container>
     </Box>
