@@ -11,7 +11,7 @@ SyncUp is a web application that helps students connect with each other, share t
 - **Buddy System**: Connect with other students
 - **Real-time Updates**: Live updates for suggestions and buddy connections
 
-## Tech Stack
+## Tech Stack (WIP, not implemented as of DEMO for HelloWorld)
 
 ### Frontend
 - React 18 with TypeScript
