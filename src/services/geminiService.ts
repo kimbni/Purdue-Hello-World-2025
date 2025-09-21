@@ -68,8 +68,6 @@ class GeminiService {
     const majors = user.majors.join(', ');
     const usedActivitiesText = usedActivities.length > 0 ? `Avoid these activities: ${usedActivities.join(', ')}` : '';
     
-    // Note: Removed major and interest specific guidance for more varied, chill activities
-    
     return `You are an AI assistant helping college students at Purdue University find fun hangout activities. 
 
 User Profile:
@@ -395,7 +393,7 @@ Duration should be in minutes (60-300 range).`;
     
     return {
       ...randomActivity,
-      suggestedTime: this.generateSuggestedTime()
+      suggestedTime: this.generateSuggestedTime(user)
     };
   }
 }
