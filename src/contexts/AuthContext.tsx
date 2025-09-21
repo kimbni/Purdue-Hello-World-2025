@@ -20,9 +20,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
   const checkAuthStatus = useCallback(async () => {
+    // Check if we have a user in localStorage (for demo mode)
+    const savedUser = localStorage.getItem('demoUser');
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+        setIsLoading(false);
+        return;
+      } catch (error) {
+        console.error('Error parsing saved user:', error);
+      }
+    }
+
+    // Try to fetch from API (for real auth)
     try {
       const response = await fetch(`${API_BASE_URL}/api/profile`, {
         credentials: 'include',
@@ -47,11 +61,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [checkAuthStatus]);
 
   const login = () => {
-    window.location.href = `${API_BASE_URL}/login`;
+    // Mock login - set a demo user
+    const mockUser: User = {
+      id: 'demo-user-123',
+      name: 'Demo User',
+      email: 'demo@example.com',
+      majors: ['Computer Science'],
+      interests: ['Technology', 'Gaming', 'Music'],
+      schedule: [],
+      buddies: []
+    };
+    setUser(mockUser);
+    // Save to localStorage for persistence across page refreshes
+    localStorage.setItem('demoUser', JSON.stringify(mockUser));
   };
 
   const logout = () => {
-    window.location.href = `${API_BASE_URL}/logout`;
+    // Mock logout - clear user
+    setUser(null);
+    // Clear localStorage
+    localStorage.removeItem('demoUser');
   };
 
   const updateUser = async (userData: Partial<User>) => {

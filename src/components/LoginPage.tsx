@@ -75,14 +75,14 @@ const LoginPage: React.FC = () => {
                 }
               }}
             >
-              Sign In
+              Enter Demo
             </Button>
           </CardActions>
         </Card>
 
         <Box textAlign="center">
           <Typography variant="body2" sx={{ color: '#999', fontSize: '0.9rem' }}>
-            Secure authentication powered by Auth0
+            Demo mode - No authentication required
           </Typography>
         </Box>
       </Paper>
