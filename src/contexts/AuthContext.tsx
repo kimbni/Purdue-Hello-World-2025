@@ -20,7 +20,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
   const checkAuthStatus = useCallback(async () => {
     // Check if we have a user in localStorage (for demo mode)
@@ -36,11 +36,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     }
 
-    // Try to fetch from API (for real auth)
+    // For demo mode, skip API calls and just set loading to false
+    if (API_BASE_URL.includes('localhost') || !process.env.REACT_APP_API_URL) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
+    // Try to fetch from API (for real auth) with timeout
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
       const response = await fetch(`${API_BASE_URL}/api/profile`, {
         credentials: 'include',
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
       
       if (response.ok) {
         const userData = await response.json();

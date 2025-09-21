@@ -208,7 +208,7 @@ function DashboardLayout() {
   }
 
   if (!isAuthenticated || !user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/loginpage" replace />;
   }
 
   return (
@@ -247,7 +247,8 @@ function AppContent() {
 
   return (
     <Routes>
-      <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+      <Route path="/" element={<Navigate to="/loginpage" replace />} />
+      <Route path="/loginpage" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
       <Route path="/dashboard/*" element={<DashboardLayout />} />
     </Routes>
   );
