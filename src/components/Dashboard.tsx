@@ -227,21 +227,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions, onUpdateSugges
           </Card>
         </Grid>
 
-        {/* Majors */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Your Majors
-              </Typography>
-              <Box display="flex" flexWrap="wrap" gap={1}>
-                {user.majors.map((major) => (
-                  <Chip key={major} label={major} color="secondary" variant="outlined" />
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
 
         {/* Pending Suggestions */}
         <Grid item xs={12}>
