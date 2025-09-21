@@ -68,11 +68,7 @@ class GeminiService {
     const majors = user.majors.join(', ');
     const usedActivitiesText = usedActivities.length > 0 ? `Avoid these activities: ${usedActivities.join(', ')}` : '';
     
-    // Create specific guidance based on majors
-    const majorGuidance = this.getMajorSpecificGuidance(user.majors);
-    
-    // Create specific guidance based on interests
-    const interestGuidance = this.getInterestSpecificGuidance(user.interests);
+    // Note: Removed major and interest specific guidance for more varied, chill activities
     
     return `You are an AI assistant helping college students at Purdue University find fun hangout activities. 
 
@@ -85,56 +81,61 @@ User Profile:
 
 ${usedActivitiesText}
 
-CRITICAL REQUIREMENTS - The activity MUST align with their profile:
+CRITICAL REQUIREMENTS - The activity should be chill and fun:
 
-${majorGuidance}
-
-${interestGuidance}
-
-Please suggest ONE creative, personalized GROUP HANGOUT ACTIVITY that DIRECTLY connects to their academic and personal interests. The activity should:
-1. DIRECTLY relate to their major(s): ${majors}
-2. DIRECTLY relate to their interests: ${interests}
-3. Be appropriate for Purdue University students in West Lafayette, Indiana
-4. Work well for a GROUP of ${buddyCount + 1} people (including the user)
-5. Be feasible and accessible for college students
-6. Be engaging and educational/fun
-7. **CRITICAL: This must be a GROUP ACTIVITY/HANGOUT, NOT a solo project or individual work**
+Please suggest ONE chill, fun GROUP HANGOUT ACTIVITY for college students. The activity should:
+1. Be a relaxed, social hangout (like "going to a concert together" or "getting coffee together")
+2. Be appropriate for Purdue University students in West Lafayette, Indiana
+3. Work well for a GROUP of ${buddyCount + 1} people (including the user)
+4. Be feasible and accessible for college students
+5. Be fun and social - no need to be educational or academic
+6. **CRITICAL: This must be a GROUP ACTIVITY/HANGOUT, NOT a solo project or individual work**
+7. **VARY THE ACTIVITY TYPE** - don't always suggest the same type of activity
 
 Respond in this EXACT JSON format:
 {
   "activity": "Activity Name",
-  "description": "Detailed description explaining how this activity connects to their ${majors} major and ${interests} interests",
+  "description": "Brief, chill description of what you'll do together",
   "location": "Specific location in West Lafayette/Purdue area",
   "duration": 120,
-  "category": "Category (Study, Entertainment, Outdoor, Food, Sports, Arts, Technology, etc.)",
-  "reasoning": "Specific explanation of how this activity aligns with their ${majors} major and ${interests} interests"
+  "category": "Category (Entertainment, Food, Outdoor, Sports, Arts, Social, etc.)",
+  "reasoning": "Why this is a fun group activity"
 }
 
 Make sure the activity is:
-- DIRECTLY relevant to their academic field (${majors})
-- DIRECTLY relevant to their personal interests (${interests})
 - Appropriate for college students
 - Feasible in the West Lafayette/Purdue area
 - Not already suggested (avoid: ${usedActivities.join(', ')})
-- Engaging and educational
+- **CHILL AND RELAXED** - like hanging out with friends
 - **A GROUP HANGOUT ACTIVITY** - NOT a solo project, individual assignment, or personal work
-- **COLLABORATIVE** - requires multiple people working together
-- **SOCIAL** - involves interaction and teamwork between group members
+- **SOCIAL** - involves interaction between group members
+- **VARIED** - try different types of activities (food, entertainment, outdoor, etc.)
+
+**GOOD EXAMPLES OF CHILL ACTIVITIES:**
+- Going to a concert together
+- Getting coffee and chatting
+- Playing board games at a cafe
+- Going to a food truck festival
+- Watching a movie together
+- Going bowling
+- Having a picnic in the park
+- Going to a farmers market
+- Playing mini golf
+- Going to a local brewery/restaurant
 
 **FORBIDDEN ACTIVITIES:**
 - Solo projects or individual work
 - Personal assignments or homework
 - Activities that can be done alone
 - Individual study sessions
-- Solo coding projects
-- Personal research
+- Academic or educational activities
+- Work-related activities
 
 **REQUIRED ACTIVITIES:**
 - Group hangouts and social activities
-- Collaborative projects requiring teamwork
-- Interactive group experiences
+- Relaxed, fun activities
 - Social bonding activities
-- Team-based challenges or competitions
+- Activities that friends do together
 
 Duration should be in minutes (60-300 range).`;
   }
@@ -224,8 +225,8 @@ Duration should be in minutes (60-300 range).`;
       
       const parsed = JSON.parse(jsonMatch[0]);
       
-      // Generate a suggested time (next 1-14 days, avoiding weekends if possible)
-      const suggestedTime = this.generateSuggestedTime();
+      // Generate a suggested time (next 1-14 days, avoiding class conflicts)
+      const suggestedTime = this.generateSuggestedTime(user);
       
       return {
         activity: parsed.activity || 'Fun Activity',
@@ -241,25 +242,71 @@ Duration should be in minutes (60-300 range).`;
     }
   }
 
-  private generateSuggestedTime(): Date {
+  private generateSuggestedTime(user?: User): Date {
     // Generate random time in the next 2 weeks
     const randomDays = Math.floor(Math.random() * 14) + 1;
-    const randomHours = Math.floor(Math.random() * 12) + 9; // Between 9 AM and 9 PM
-    const randomMinutes = Math.random() < 0.5 ? 0 : 30; // Either on the hour or half hour
     
     const suggestedTime = new Date();
     suggestedTime.setDate(suggestedTime.getDate() + randomDays);
-    suggestedTime.setHours(randomHours, randomMinutes, 0, 0);
     
-    // Ensure it's not on a weekend if possible
-    const dayOfWeek = suggestedTime.getDay();
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-      // Move to next Monday if it's weekend
-      const daysToAdd = dayOfWeek === 0 ? 1 : 2;
-      suggestedTime.setDate(suggestedTime.getDate() + daysToAdd);
+    // Try to find a good time that doesn't conflict with classes
+    let attempts = 0;
+    let goodTime = false;
+    
+    while (!goodTime && attempts < 10) {
+      // Generate random time between 10 AM and 8 PM
+      const randomHours = Math.floor(Math.random() * 10) + 10; // Between 10 AM and 8 PM
+      const randomMinutes = Math.random() < 0.5 ? 0 : 30; // Either on the hour or half hour
+      
+      suggestedTime.setHours(randomHours, randomMinutes, 0, 0);
+      
+      // Check if this time conflicts with any classes
+      if (user && user.schedule) {
+        const conflictsWithClass = this.hasClassConflict(suggestedTime, user.schedule);
+        if (!conflictsWithClass) {
+          goodTime = true;
+        }
+      } else {
+        goodTime = true; // If no schedule info, just use the time
+      }
+      
+      attempts++;
+    }
+    
+    // If we couldn't find a good time, use evening hours (6-8 PM) which are less likely to conflict
+    if (!goodTime) {
+      const eveningHours = Math.floor(Math.random() * 3) + 18; // 6-8 PM
+      suggestedTime.setHours(eveningHours, 0, 0, 0);
     }
     
     return suggestedTime;
+  }
+
+  private hasClassConflict(suggestedTime: Date, schedule: any[]): boolean {
+    const dayOfWeek = suggestedTime.getDay();
+    const suggestedHour = suggestedTime.getHours();
+    const suggestedMinute = suggestedTime.getMinutes();
+    const suggestedTimeMinutes = suggestedHour * 60 + suggestedMinute;
+    
+    // Check each class for conflicts
+    for (const classItem of schedule) {
+      if (classItem.dayOfWeek === dayOfWeek) {
+        const startTime = this.parseTimeToMinutes(classItem.startTime);
+        const endTime = this.parseTimeToMinutes(classItem.endTime);
+        
+        // Check if suggested time overlaps with class time (with 30 min buffer)
+        if (suggestedTimeMinutes >= (startTime - 30) && suggestedTimeMinutes <= (endTime + 30)) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  }
+
+  private parseTimeToMinutes(timeString: string): number {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    return hours * 60 + minutes;
   }
 
   private getFallbackSuggestion(user?: User): {
@@ -270,71 +317,77 @@ Duration should be in minutes (60-300 range).`;
     category: string;
     suggestedTime: Date;
   } {
-    // If we have user data, try to create a more relevant fallback
+    // If we have user data, create chill fallback activities
     if (user) {
-      const majors = user.majors.map(m => m.toLowerCase());
-      const interests = user.interests.map(i => i.toLowerCase());
       
-      // Check for CS/Technology major or interest
-      if (majors.some(m => m.includes('computer') || m.includes('cs')) || 
-          interests.some(i => i.includes('technology') || i.includes('gaming'))) {
-        return {
-          activity: 'Group Tech Study Session',
-          description: 'Collaborative coding session with your study group focusing on current coursework and tech projects',
-          location: 'Purdue CS Building Study Room',
+      // Random chill fallback activities
+      const chillActivities = [
+        {
+          activity: 'Coffee Hangout',
+          description: 'Grab coffee and chat with your friends at a local cafe',
+          location: 'Local Coffee Shop',
+          duration: 90,
+          category: 'Food'
+        },
+        {
+          activity: 'Movie Night',
+          description: 'Watch a movie together at home or at the cinema',
+          location: 'Home or Cinema',
           duration: 150,
-          category: 'Study',
-          suggestedTime: this.generateSuggestedTime()
-        };
-      }
-      
-      // Check for engineering major
-      if (majors.some(m => m.includes('engineering'))) {
-        return {
-          activity: 'Team Engineering Project Workshop',
-          description: 'Collaborative hands-on engineering project session with your study group',
-          location: 'Purdue Engineering Building',
-          duration: 180,
-          category: 'Study',
-          suggestedTime: this.generateSuggestedTime()
-        };
-      }
-      
-      // Check for music interest
-      if (interests.some(i => i.includes('music'))) {
-        return {
-          activity: 'Group Music Jam Session',
-          description: 'Collaborative music making session with friends - bring instruments and create together',
-          location: 'Purdue Music Building or Student Union',
+          category: 'Entertainment'
+        },
+        {
+          activity: 'Bowling Night',
+          description: 'Go bowling together and have some fun',
+          location: 'Local Bowling Alley',
           duration: 120,
-          category: 'Entertainment',
-          suggestedTime: this.generateSuggestedTime()
-        };
-      }
+          category: 'Sports'
+        },
+        {
+          activity: 'Food Truck Festival',
+          description: 'Check out local food trucks and try different cuisines together',
+          location: 'Downtown Food Truck Park',
+          duration: 120,
+          category: 'Food'
+        },
+        {
+          activity: 'Picnic in the Park',
+          description: 'Have a relaxing picnic together in a local park',
+          location: 'Local Park',
+          duration: 120,
+          category: 'Outdoor'
+        }
+      ];
+      
+      const randomActivity = chillActivities[Math.floor(Math.random() * chillActivities.length)];
+      return {
+        ...randomActivity,
+        suggestedTime: this.generateSuggestedTime(user)
+      };
     }
     
-    // Default fallback activities - all group activities
+    // Default fallback activities - all chill group activities
     const fallbackActivities = [
       {
-        activity: 'Group Coffee & Study Session',
-        description: 'Grab coffee and study together as a group at a local cafe',
+        activity: 'Coffee Hangout',
+        description: 'Grab coffee and chat with your friends at a local cafe',
         location: 'Local Coffee Shop',
-        duration: 120,
-        category: 'Study'
+        duration: 90,
+        category: 'Food'
       },
       {
-        activity: 'Group Campus Exploration',
-        description: 'Take a group walk around campus and discover new spots together',
+        activity: 'Campus Walk',
+        description: 'Take a relaxing walk around campus and discover new spots together',
         location: 'Purdue Campus',
         duration: 90,
         category: 'Outdoor'
       },
       {
-        activity: 'Collaborative Study Group Session',
-        description: 'Team study session with your buddies - work on assignments together',
-        location: 'Purdue Library',
-        duration: 150,
-        category: 'Study'
+        activity: 'Game Night',
+        description: 'Play board games or video games together',
+        location: 'Home or Game Cafe',
+        duration: 120,
+        category: 'Entertainment'
       }
     ];
     
