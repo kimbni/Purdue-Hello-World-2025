@@ -24,7 +24,7 @@ import {
   Chip
 } from '@mui/material';
 import { Add, Edit, Delete, Schedule, ChevronLeft, ChevronRight } from '@mui/icons-material';
-import { User, ClassSchedule } from '../types';
+import { User, ClassSchedule, HangoutSuggestion } from '../types';
 
 interface ScheduleManagerProps {
   user: User;
@@ -113,6 +113,39 @@ const ScheduleManager: React.FC<ScheduleManagerProps> = ({ user, onUpdateUser })
     return user.schedule
       .filter(c => c.dayOfWeek === dayOfWeek)
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  };
+
+  const getAcceptedHangoutsForDay = (dayOfWeek: number) => {
+    return user.suggestions
+      .filter(suggestion => suggestion.status === 'accepted')
+      .filter(suggestion => {
+        const suggestionDate = new Date(suggestion.suggestedTime);
+        return suggestionDate.getDay() === dayOfWeek;
+      })
+      .map(suggestion => {
+        const suggestionDate = new Date(suggestion.suggestedTime);
+        const startTime = suggestionDate.toTimeString().slice(0, 5); // HH:MM format
+        const endTime = new Date(suggestionDate.getTime() + suggestion.duration * 60000)
+          .toTimeString().slice(0, 5); // HH:MM format
+        
+        return {
+          id: `hangout-${suggestion.id}`,
+          name: suggestion.title,
+          dayOfWeek: dayOfWeek,
+          startTime: startTime,
+          endTime: endTime,
+          location: suggestion.location,
+          isHangout: true,
+          originalSuggestion: suggestion
+        };
+      })
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  };
+
+  const getAllEventsForDay = (dayOfWeek: number) => {
+    const classes = getClassesForDay(dayOfWeek);
+    const hangouts = getAcceptedHangoutsForDay(dayOfWeek);
+    return [...classes, ...hangouts].sort((a, b) => a.startTime.localeCompare(b.startTime));
   };
 
   const getWeekDates = (date: Date) => {
@@ -214,7 +247,7 @@ const ScheduleManager: React.FC<ScheduleManagerProps> = ({ user, onUpdateUser })
 
             {/* Days of week */}
             {DAYS_OF_WEEK.map((day, dayIndex) => {
-              const classes = getClassesForDay(dayIndex);
+              const events = getAllEventsForDay(dayIndex);
               const isToday = weekDates[dayIndex].toDateString() === new Date().toDateString();
               
               return (
@@ -257,40 +290,43 @@ const ScheduleManager: React.FC<ScheduleManagerProps> = ({ user, onUpdateUser })
                       />
                     ))}
 
-                    {/* Classes for this day */}
-                    {classes.map((classItem) => {
-                      const top = getTimeSlotPosition(classItem.startTime);
-                      const height = getEventHeight(classItem.startTime, classItem.endTime);
+                    {/* Events for this day */}
+                    {events.map((event) => {
+                      const top = getTimeSlotPosition(event.startTime);
+                      const height = getEventHeight(event.startTime, event.endTime);
+                      const isHangout = (event as any).isHangout;
                       
                       return (
                         <Box
-                          key={classItem.id}
+                          key={event.id}
                           sx={{
                             position: 'absolute',
                             top: top,
                             left: 4,
                             right: 4,
                             height: height,
-                            backgroundColor: 'primary.main',
-                            color: 'primary.contrastText',
+                            backgroundColor: isHangout ? 'secondary.main' : 'primary.main',
+                            color: isHangout ? 'secondary.contrastText' : 'primary.contrastText',
                             borderRadius: 1,
                             p: 1,
                             cursor: 'pointer',
+                            border: isHangout ? '2px solid' : 'none',
+                            borderColor: isHangout ? 'secondary.dark' : 'transparent',
                             '&:hover': {
-                              backgroundColor: 'primary.dark'
+                              backgroundColor: isHangout ? 'secondary.dark' : 'primary.dark'
                             }
                           }}
-                          onClick={() => handleOpen(classItem)}
+                          onClick={() => !isHangout && handleOpen(event as ClassSchedule)}
                         >
                           <Typography variant="caption" fontWeight="bold" noWrap>
-                            {classItem.name}
+                            {isHangout ? '🎉 ' : ''}{event.name}
                           </Typography>
                           <Typography variant="caption" display="block" noWrap>
-                            {classItem.startTime} - {classItem.endTime}
+                            {event.startTime} - {event.endTime}
                           </Typography>
-                          {classItem.location && (
+                          {event.location && (
                             <Typography variant="caption" display="block" noWrap>
-                              {classItem.location}
+                              {event.location}
                             </Typography>
                           )}
                         </Box>

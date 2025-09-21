@@ -26,15 +26,82 @@ import { User, HangoutSuggestion } from '../types';
 interface DashboardProps {
   user: User;
   suggestions: HangoutSuggestion[];
+  onUpdateSuggestions?: (suggestions: HangoutSuggestion[]) => Promise<void>;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
+const Dashboard: React.FC<DashboardProps> = ({ user, suggestions, onUpdateSuggestions }) => {
   const pendingSuggestions = suggestions.filter(s => s.status === 'pending');
+  const acceptedSuggestions = suggestions.filter(s => s.status === 'accepted');
   const upcomingClasses = user.schedule.filter(c => {
     const today = new Date();
     const dayOfWeek = today.getDay();
     return c.dayOfWeek === dayOfWeek;
   });
+
+  const handleResponse = async (suggestionId: string, response: 'accepted' | 'declined') => {
+    if (!onUpdateSuggestions) return;
+    
+    if (response === 'declined') {
+      // Remove the suggestion entirely when declined
+      const updatedSuggestions = suggestions.filter(suggestion => suggestion.id !== suggestionId);
+      await onUpdateSuggestions(updatedSuggestions);
+      return;
+    }
+
+    // Handle acceptance
+    const updatedSuggestions = suggestions.map(suggestion => {
+      if (suggestion.id === suggestionId) {
+        const newResponses = {
+          ...suggestion.responses,
+          [user.id]: response
+        };
+        
+        // Check if all participants have responded
+        const allResponded = suggestion.participants.every(participantId => 
+          newResponses[participantId] !== undefined
+        );
+        
+        const allAccepted = suggestion.participants.every(participantId => 
+          newResponses[participantId] === 'accepted'
+        );
+        
+        let newStatus: 'pending' | 'accepted' | 'declined' | 'completed' = suggestion.status;
+        if (allResponded) {
+          newStatus = allAccepted ? 'accepted' : 'declined';
+        }
+        
+        return {
+          ...suggestion,
+          responses: newResponses,
+          status: newStatus
+        };
+      }
+      return suggestion;
+    });
+    
+    await onUpdateSuggestions(updatedSuggestions);
+  };
+
+  const handleUnaccept = async (suggestionId: string) => {
+    if (!onUpdateSuggestions) return;
+    
+    const updatedSuggestions = suggestions.map(suggestion => {
+      if (suggestion.id === suggestionId) {
+        // Remove user's response and set status back to pending
+        const newResponses = { ...suggestion.responses };
+        delete newResponses[user.id];
+        
+        return {
+          ...suggestion,
+          responses: newResponses,
+          status: 'pending' as const
+        };
+      }
+      return suggestion;
+    });
+    
+    await onUpdateSuggestions(updatedSuggestions);
+  };
 
   return (
     <Box>
@@ -192,7 +259,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
                       </ListItemIcon>
                       <ListItemText
                         primary={suggestion.title}
-                        secondary={`${suggestion.activity} at ${suggestion.location} • ${suggestion.suggestedTime.toLocaleDateString()}`}
+                        secondary={`${suggestion.activity} at ${suggestion.location} • ${new Date(suggestion.suggestedTime).toLocaleDateString()}`}
                       />
                       <Box>
                         <Button
@@ -200,6 +267,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
                           startIcon={<CheckCircle />}
                           color="success"
                           sx={{ mr: 1 }}
+                          onClick={() => handleResponse(suggestion.id, 'accepted')}
                         >
                           Accept
                         </Button>
@@ -207,6 +275,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
                           size="small"
                           startIcon={<Cancel />}
                           color="error"
+                          onClick={() => handleResponse(suggestion.id, 'declined')}
                         >
                           Decline
                         </Button>
@@ -222,6 +291,42 @@ const Dashboard: React.FC<DashboardProps> = ({ user, suggestions }) => {
             </CardContent>
           </Card>
         </Grid>
+
+        {/* Accepted Suggestions */}
+        {acceptedSuggestions.length > 0 && (
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Accepted Hangout Suggestions
+                </Typography>
+                <List>
+                  {acceptedSuggestions.map((suggestion) => (
+                    <ListItem key={suggestion.id}>
+                      <ListItemIcon>
+                        <CheckCircle color="success" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={suggestion.title}
+                        secondary={`${suggestion.activity} at ${suggestion.location} • ${new Date(suggestion.suggestedTime).toLocaleDateString()}`}
+                      />
+                      <Box>
+                        <Button
+                          size="small"
+                          startIcon={<Cancel />}
+                          color="warning"
+                          onClick={() => handleUnaccept(suggestion.id)}
+                        >
+                          Unaccept
+                        </Button>
+                      </Box>
+                    </ListItem>
+                  ))}
+                </List>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
     </Box>
   );

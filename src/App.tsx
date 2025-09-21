@@ -174,20 +174,12 @@ function DashboardNav({ user, logout }: { user: User; logout: () => void }) {
 // Dashboard layout component
 function DashboardLayout() {
   const { user, isLoading, isAuthenticated, logout, updateUser } = useAuth();
-  const [suggestions, setSuggestions] = useState<HangoutSuggestion[]>([]);
 
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      loadSuggestions();
-    }
-  }, [isAuthenticated, user]);
-
-  const loadSuggestions = async () => {
+  const handleUpdateSuggestions = async (suggestions: HangoutSuggestion[]) => {
     try {
-      const userSuggestions = await apiService.getSuggestions();
-      setSuggestions(userSuggestions);
+      await updateUser({ suggestions });
     } catch (error) {
-      console.error('Error loading suggestions:', error);
+      console.error('Error updating suggestions:', error);
     }
   };
 
@@ -217,14 +209,14 @@ function DashboardLayout() {
       
       <Container maxWidth="lg" sx={{ mt: 4 }}>
         <Routes>
-          <Route index element={<Dashboard user={user} suggestions={suggestions} />} />
+          <Route index element={<Dashboard user={user} suggestions={user.suggestions} onUpdateSuggestions={handleUpdateSuggestions} />} />
           <Route path="schedule" element={<ScheduleManager user={user} onUpdateUser={handleUpdateUser} />} />
           <Route path="info" element={<InfoManager user={user} onUpdateUser={handleUpdateUser} />} />
           <Route path="suggestions" element={
             <HangoutSuggestions 
               user={user} 
-              suggestions={suggestions}
-              onUpdateSuggestions={setSuggestions}
+              suggestions={user.suggestions}
+              onUpdateSuggestions={handleUpdateSuggestions}
             />
           } />
           <Route path="buddies" element={<BuddiesManager user={user} onUpdateUser={handleUpdateUser} />} />

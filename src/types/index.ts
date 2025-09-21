@@ -6,6 +6,7 @@ export interface User {
   majors: string[];
   schedule: ClassSchedule[];
   buddies: string[];
+  suggestions: HangoutSuggestion[];
 }
 
 export interface ClassSchedule {
